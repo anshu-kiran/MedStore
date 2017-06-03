@@ -13,12 +13,34 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import android.os.AsyncTask;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private  List<Medicine> medicines;
+    private RecyclerView recyclerView;
+    private GridLayoutManager gridLayout;
+    private MedicineAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,12 +49,32 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        recyclerView = (RecyclerView)findViewById(R.id.recyclerview);
+        medicines = new ArrayList<>();
+        getMedFromDB(0);
+
+        gridLayout = new GridLayoutManager(this, 2);
+        recyclerView.setLayoutManager(gridLayout);
+
+        adapter = new MedicineAdapter(this,medicines);
+        recyclerView.setAdapter(adapter);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                if (gridLayout.findLastCompletelyVisibleItemPosition() == medicines.size() - 1) {
+                    getMedFromDB(medicines.get(medicines.size() - 1).getId());
+                }
+
+            }
+        });
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "This opens search page", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startActivity(new Intent(MainActivity.this, Search.class));
             }
         });
 
@@ -45,6 +87,49 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
+
+    private void getMedFromDB(int id){
+        AsyncTask<Integer, Void, Void> asyncTask = new AsyncTask<Integer, Void, Void>() {
+            @Override
+            protected Void doInBackground(Integer... medIds) {
+
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url("http://192.168.0.102/medstoretest/display.php?id=" + medIds[0])
+                        .build();
+                try {
+                    Response response = client.newCall(request).execute();
+
+                    JSONArray array = new JSONArray(response.body().string());
+
+                    for (int i = 0; i < array.length(); i++) {
+
+                        JSONObject object = array.getJSONObject(i);
+
+                        Medicine medicine = new Medicine(object.getInt("id"), object.getString("med_name"),
+                                object.getString("med_image"), object.getString("med_price"));
+
+                        MainActivity.this.medicines.add(medicine);
+                    }
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                adapter.notifyDataSetChanged();
+            }
+        };
+
+        asyncTask.execute(id);
+    }
+
 
     @Override
     public void onBackPressed() {

@@ -2,8 +2,8 @@ package com.example.anshu.medstore;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,11 +15,33 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import android.os.AsyncTask;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class UserLand extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private ActionBarDrawerToggle drawerToggle;
     View parentView;
+
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private  List<Medicine> medicines;
+    private RecyclerView recyclerView;
+    private GridLayoutManager gridLayout;
+    private MedicineAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +51,35 @@ public class UserLand extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.user_toolbar);
         setSupportActionBar(toolbar);
 
+        recyclerView = (RecyclerView)findViewById(R.id.recyclerview);
+        medicines = new ArrayList<>();
+        getMedFromDB(0);
+
+        gridLayout = new GridLayoutManager(this, 2);
+        recyclerView.setLayoutManager(gridLayout);
+
+        adapter = new MedicineAdapter(this,medicines);
+        recyclerView.setAdapter(adapter);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                if (gridLayout.findLastCompletelyVisibleItemPosition() == medicines.size() - 1) {
+                    getMedFromDB(medicines.get(medicines.size() - 1).getId());
+                }
+
+            }
+        });
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(UserLand.this, Search.class));
+            }
+        });
+
         DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.user_drawer);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -37,6 +88,48 @@ public class UserLand extends AppCompatActivity
 
         NavigationView nvDrawer = (NavigationView)findViewById(R.id.nvView);
         nvDrawer.setNavigationItemSelectedListener(this);
+    }
+
+    private void getMedFromDB(int id){
+        AsyncTask<Integer, Void, Void> asyncTask = new AsyncTask<Integer, Void, Void>() {
+            @Override
+            protected Void doInBackground(Integer... medIds) {
+
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url("http://192.168.0.102/medstoretest/display.php?id=" + medIds[0])
+                        .build();
+                try {
+                    Response response = client.newCall(request).execute();
+
+                    JSONArray array = new JSONArray(response.body().string());
+
+                    for (int i = 0; i < array.length(); i++) {
+
+                        JSONObject object = array.getJSONObject(i);
+
+                        Medicine medicine = new Medicine(object.getInt("id"), object.getString("med_name"),
+                                object.getString("med_image"), object.getString("med_price"));
+
+                        UserLand.this.medicines.add(medicine);
+                    }
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                adapter.notifyDataSetChanged();
+            }
+        };
+
+        asyncTask.execute(id);
     }
 
     @Override
@@ -84,9 +177,5 @@ public class UserLand extends AppCompatActivity
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-
-
-
 }
 
