@@ -37,7 +37,7 @@ public class UserLand extends AppCompatActivity
     private ActionBarDrawerToggle drawerToggle;
     View parentView;
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = LogInActivity.class.getSimpleName();
     private  List<Medicine> medicines;
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayout;
@@ -154,7 +154,7 @@ public class UserLand extends AppCompatActivity
         }else if (id == R.id.cart) {
             Toast.makeText(this, "Opens cart", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.signout) {
-            startActivity(new Intent(UserLand.this, MainActivity.class));
+            startActivity(new Intent(UserLand.this, LogInActivity.class));
             //Snackbar.make(getWindow().getDecorView().getRootView(),"Logged out", Snackbar.LENGTH_LONG).show();
             Toast.makeText(this, "You have been logged out", Toast.LENGTH_SHORT).show();
         }else if (id == R.id.about){
