@@ -43,10 +43,15 @@ public class UserLand extends AppCompatActivity
     private GridLayoutManager gridLayout;
     private MedicineAdapter adapter;
 
+    SessionManager session;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_land);
+
+        session = new SessionManager(getApplicationContext());
+        session.checkLogin();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.user_toolbar);
         setSupportActionBar(toolbar);
@@ -97,7 +102,7 @@ public class UserLand extends AppCompatActivity
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("http://192.168.0.102/medstoretest/display.php?id=" + medIds[0])
+                        .url("http://192.168.0.101/medstoretest/display.php?id=" + medIds[0])
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
@@ -146,15 +151,17 @@ public class UserLand extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.pres) {
+        /*if (id == R.id.pres) {
             Toast.makeText(this, "Opens the list of prescription drugs", Toast.LENGTH_SHORT).show();
             // Handle camera action
         } else if (id == R.id.nopres){
             Toast.makeText(this, "Opens the list of non-prescription drugs", Toast.LENGTH_SHORT).show();
-        }else if (id == R.id.cart) {
+        }*/
+        if (id == R.id.cart) {
             Toast.makeText(this, "Opens cart", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.signout) {
-            startActivity(new Intent(UserLand.this, LogInActivity.class));
+            session.logoutUser();
+
             //Snackbar.make(getWindow().getDecorView().getRootView(),"Logged out", Snackbar.LENGTH_LONG).show();
             Toast.makeText(this, "You have been logged out", Toast.LENGTH_SHORT).show();
         }else if (id == R.id.about){

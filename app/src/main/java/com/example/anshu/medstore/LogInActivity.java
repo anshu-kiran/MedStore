@@ -12,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-
 public class LogInActivity extends AppCompatActivity {
 
     Button loginButton;
@@ -23,13 +22,21 @@ public class LogInActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
 
+    SessionManager session;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
 
+        session = new SessionManager(getApplicationContext());
+
         userText = (EditText)findViewById(R.id.input_user);
         passwordText = (EditText)findViewById(R.id.input_password);
+
+        /*Toast.makeText(getApplicationContext(),
+                "User Login Status: " + session.isLoggedIn(),
+                Toast.LENGTH_LONG).show();*/
 
         loginButton = (Button) findViewById(R.id.btn_login);
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -74,7 +81,13 @@ public class LogInActivity extends AppCompatActivity {
         // TODO: Implement your own authentication logic here.
 
         if(email.equals("user") && password.equals("user")){
+            session.createLoginSession("user");
             Intent intent = new Intent(getApplicationContext(), UserLand.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            // Add new Flag to start new Activity
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
             onActivityResult(REQUEST_SIGNUP, RESULT_OK, intent);
         }
         else{
