@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -23,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,8 @@ public class UserLand extends AppCompatActivity
     private MedicineAdapter adapter;
 
     SessionManager session;
+
+    SQLiteHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +106,7 @@ public class UserLand extends AppCompatActivity
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("http://192.168.0.101/medstoretest/display.php?id=" + medIds[0])
+                        .url("http://192.168.0.104/medstoretest/display.php?id=" + medIds[0])
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
@@ -151,14 +155,23 @@ public class UserLand extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        /*if (id == R.id.pres) {
-            Toast.makeText(this, "Opens the list of prescription drugs", Toast.LENGTH_SHORT).show();
-            // Handle camera action
-        } else if (id == R.id.nopres){
-            Toast.makeText(this, "Opens the list of non-prescription drugs", Toast.LENGTH_SHORT).show();
-        }*/
+
         if (id == R.id.cart) {
-            Toast.makeText(this, "Opens cart", Toast.LENGTH_SHORT).show();
+            db = new SQLiteHandler(this.getApplicationContext());
+
+            Log.d("Reading: ", "Reading all contacts..");
+            List<Product> products = db.getAllProducts();
+
+            for (Product cn : products) {
+                String log = "Id: "+cn.getId()+" ,Name: " + cn.getName() + " ,Price: " + cn.getPrice();
+                // Writing Contacts to log
+                Log.d("Name: ", log);
+            }
+
+            Intent i = new Intent(getApplicationContext(), Cart.class);
+            startActivity(i);
+
+
         } else if (id == R.id.signout) {
             session.logoutUser();
 
