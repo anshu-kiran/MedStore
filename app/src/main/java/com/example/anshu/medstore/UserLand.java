@@ -106,7 +106,7 @@ public class UserLand extends AppCompatActivity
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("http://192.168.0.104/medstoretest/display.php?id=" + medIds[0])
+                        .url("http:/192.168.110.120/medstoretest/display.php?id=" + medIds[0])
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
@@ -177,7 +177,13 @@ public class UserLand extends AppCompatActivity
 
             //Snackbar.make(getWindow().getDecorView().getRootView(),"Logged out", Snackbar.LENGTH_LONG).show();
             Toast.makeText(this, "You have been logged out", Toast.LENGTH_SHORT).show();
-        }else if (id == R.id.about){
+        }else if (id == R.id.upload){
+            Intent i = new Intent(getApplicationContext(), Prescription.class);
+            startActivity(i);
+
+        }
+
+        else if (id == R.id.about){
             //opens about dialog
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage("Developed by Anshu Kiran Sharma and Namrata Giri").setTitle(R.string.dialog_title);
