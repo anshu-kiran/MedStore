@@ -3,7 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Cart"
-    xmlns:card_view="http://schemas.android.com/tools">
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:background="@color/colorPrimary">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="CART"
+        android:textSize="45dp"
+        android:textColor="@color/white"
+        android:background="@color/colorAccent"
+        android:textAlignment="center"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/cartrecyclerview"
@@ -13,26 +25,37 @@
         card_view:cardElevation="4dp"
         card_view:cardCornerRadius="4dp"
         android:scrollbars="vertical"
-        android:layout_marginTop="6dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"/>
+        android:layout_marginTop="60dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:background="@color/white"
+        />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/cartrecyclerview"
         android:id="@+id/btnClr"
-        android:text="Clear"/>
+        android:text="Clear"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="14dp"
+        android:padding="12dp"
+        android:textColor="#fff"
+        android:background="#000095"/>
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Proceed to Checkout"
-        android:layout_below="@+id/cartrecyclerview"
-        android:layout_toRightOf="@+id/btnClr"
-        android:layout_toEndOf="@+id/btnClr"
-        android:layout_marginLeft="125dp"
-        android:layout_marginStart="125dp"
-        android:id="@+id/chckOut"/>
+        android:layout_below="@+id/btnClr"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:id="@+id/chckOut"
+        android:layout_marginBottom="24dp"
+        android:padding="12dp"
+        android:textColor="#fff"
+        android:background="#000095"/>
 
 </RelativeLayout>

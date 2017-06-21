@@ -113,6 +113,41 @@ public class SQLiteHandler  extends SQLiteOpenHelper {
         return productList;
     }
 
+    //Getting medicine names
+    public List<Product>getMedName(){
+        List<Product> productList = new ArrayList<Product>();
+        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        //ArrayList<String> array = new ArrayList<String>();
+        if (cursor.moveToFirst()) {
+            do {
+                Product product = new Product();
+                product.setName(cursor.getString(1));
+                productList.add(product);
+            } while (cursor.moveToNext());
+        }
+
+        return productList;
+    }
+
+    //Getting total price
+    public List<Product> getTotalPrice(){
+        List<Product> productList = new ArrayList<Product>();
+        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        int price = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                Product product = new Product();
+                product.setPrice(cursor.getString(1));
+                productList.add(product);
+            } while (cursor.moveToNext());
+        }
+        return productList;
+    }
+
     // Updating single contact
     public int updateProduct(Product product) {
         SQLiteDatabase db = this.getWritableDatabase();

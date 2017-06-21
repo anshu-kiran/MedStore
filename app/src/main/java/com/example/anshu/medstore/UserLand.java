@@ -106,7 +106,7 @@ public class UserLand extends AppCompatActivity
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("http:/192.168.110.120/medstoretest/display.php?id=" + medIds[0])
+                        .url("http:/192.168.0.103/medstoretest/display.php?id=" + medIds[0])
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
