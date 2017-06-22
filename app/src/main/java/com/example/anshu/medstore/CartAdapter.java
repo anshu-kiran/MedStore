@@ -13,16 +13,17 @@ import java.util.List;
  * Created by Anshu on 6/20/2017.
  */
 
-public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.Myholder> {
+public class CartAdapter extends RecyclerView.Adapter<CartAdapter.Myholder> {
     List<Product> products;
     private Context context;
+    SQLiteHandler db;
 
-    public RecycleAdapter(Context context, List<Product> products) {
+    public CartAdapter(Context context, List<Product> products) {
         this.products = products;
         this.context = context;
     }
 
-    public RecycleAdapter(List<Product> products) {
+    public CartAdapter(List<Product> products) {
         this.products = products;
     }
 
@@ -35,8 +36,8 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.Myholder
     @Override
     public void onBindViewHolder(Myholder holder, int position) {
         Product product=products.get(position);
-        holder.name.setText(product.getName());
-        holder.price.setText(product.getPrice());
+        holder.name.setText("Name : \t"+product.getName());
+        holder.price.setText("Price : \tRs."+product.getPrice());
     }
 
     @Override
@@ -49,7 +50,6 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.Myholder
 
         public Myholder(View itemView) {
             super(itemView);
-
             name = (TextView) itemView.findViewById(R.id.medName);
             price = (TextView) itemView.findViewById(R.id.medPrice);
         }

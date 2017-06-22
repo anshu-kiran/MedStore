@@ -51,7 +51,7 @@ public class MedicineAdapter extends RecyclerView.Adapter<MedicineAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.medName.setText(medicines.get(position).getMedName());
-        holder.medPrice.setText(medicines.get(position).getMedPrice());
+        holder.medPrice.setText("Rs. "+medicines.get(position).getMedPrice());
         Glide.with(context).load(medicines.get(position).getMedLink()).into(holder.imageView);
     }
 

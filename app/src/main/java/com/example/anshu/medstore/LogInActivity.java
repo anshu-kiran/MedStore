@@ -90,6 +90,15 @@ public class LogInActivity extends AppCompatActivity {
 
             onActivityResult(REQUEST_SIGNUP, RESULT_OK, intent);
         }
+        else if(email.equals("admin") && password.equals("admin")){
+            Intent intent = new Intent(getApplicationContext(), AdminPanel.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            // Add new Flag to start new Activity
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            onActivityResult(REQUEST_SIGNUP, RESULT_OK, intent);
+        }
         else{
             onLoginFailed();
         }

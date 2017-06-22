@@ -28,7 +28,7 @@ public class Cart extends AppCompatActivity {
 
     SQLiteHandler db;
     RecyclerView recyclerView;
-    RecycleAdapter recycler;
+    CartAdapter recycler;
     List<Product> product;
 
     Button chckOut, clear;
@@ -44,7 +44,7 @@ public class Cart extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
-        product =new ArrayList<Product>();
+        product =new ArrayList<>();
         recyclerView = (RecyclerView) findViewById(R.id.cartrecyclerview);
 
         session = new SessionManager(getApplicationContext());
@@ -52,7 +52,7 @@ public class Cart extends AppCompatActivity {
         db = new SQLiteHandler(this.getApplicationContext());
 
         product =  db.getAllProducts();
-        recycler =new RecycleAdapter(product);
+        recycler =new CartAdapter(product);
 
         chckOut = (Button)findViewById(R.id.chckOut);
         chckOut.setOnClickListener(new View.OnClickListener(){
@@ -61,7 +61,7 @@ public class Cart extends AppCompatActivity {
             public void onClick(View view) {
                 Log.d("Reading: ", "Reading medicine names..");
                 List<Product> products = db.getMedName();
-                ArrayList<String> array = new ArrayList<String>();
+                ArrayList<String> array = new ArrayList<>();
                 for (Product cn : product) {
                     String log = cn.getName();
                     array.add(log);
