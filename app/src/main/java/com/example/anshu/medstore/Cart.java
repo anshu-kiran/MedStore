@@ -37,7 +37,7 @@ public class Cart extends AppCompatActivity {
     String usern;
 
     private OkHttpClient okhttpclient;
-    private String url_order_insert = "http://192.168.0.103/MedStoreTest/order_insert.php";
+    private String url_order_insert = "http://192.168.0.102/MedStoreTest/order_insert.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

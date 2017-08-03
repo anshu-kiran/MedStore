@@ -33,7 +33,7 @@ public class SignUpActivity extends AppCompatActivity {
     private Request request;
 
     //url
-    private String url_create_user = "http://192.168.0.103/MedStoreTest/create_user.php";
+    private String url_create_user = "http://192.168.0.102/MedStoreTest/create_user.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

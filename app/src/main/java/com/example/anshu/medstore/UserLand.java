@@ -1,17 +1,21 @@
 package com.example.anshu.medstore;
 
+import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -27,10 +31,15 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class UserLand extends AppCompatActivity
@@ -48,6 +57,11 @@ public class UserLand extends AppCompatActivity
     SessionManager session;
 
     SQLiteHandler db;
+
+    private OkHttpClient okhttpclient;
+    private Request request;
+
+    private String url_search = "http://192.168.0.102/MedStoreTest/connect_python.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,13 +95,13 @@ public class UserLand extends AppCompatActivity
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(UserLand.this, Search.class));
             }
-        });
+        });*/
 
         DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.user_drawer);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -99,6 +113,73 @@ public class UserLand extends AppCompatActivity
         nvDrawer.setNavigationItemSelectedListener(this);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        // Retrieve the SearchView and plug it into SearchManager
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.menu_search));
+        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                okhttpclient = new OkHttpClient();
+
+                RequestBody Body = new FormBody.Builder().add("Query", query.toString()).build();
+
+                Request request = new Request.Builder().url(url_search).post(Body).build();
+
+                okhttpclient.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.i(TAG,e.getMessage());
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        searchRes(response.body().string());
+                    }
+                });
+
+                searchView.clearFocus();
+                return true;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void searchRes(String res){
+        System.out.println(">>>>>>>>"+res);
+
+        JSONArray jsonArray = null;
+        String[] strArr= null;
+        try {
+            jsonArray = new JSONArray(res);
+            strArr = new String[jsonArray.length()];
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                strArr[i] = jsonArray.getString(i);
+            }
+
+            System.out.println(Arrays.toString(strArr));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if(strArr[0].equals("levestein_distance")){
+            Intent intent = new Intent(UserLand.this, Search.class);
+            intent.putExtra("message", strArr[1]);
+            intent.putExtra("message1", strArr[2]);
+            startActivity(intent);
+        }
+    }
+
     private void getMedFromDB(int id){
         AsyncTask<Integer, Void, Void> asyncTask = new AsyncTask<Integer, Void, Void>() {
             @Override
@@ -106,7 +187,7 @@ public class UserLand extends AppCompatActivity
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("http:/192.168.0.103/medstoretest/display.php?id=" + medIds[0])
+                        .url("http:/192.168.0.102/medstoretest/display.php?id=" + medIds[0])
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
