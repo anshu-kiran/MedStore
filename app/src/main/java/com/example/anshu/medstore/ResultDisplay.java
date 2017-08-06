@@ -1,27 +1,17 @@
 package com.example.anshu.medstore;
 
 import android.app.SearchManager;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
+import android.os.AsyncTask;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
-
-import android.os.AsyncTask;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.util.Log;
+import android.view.Menu;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,26 +25,19 @@ import java.util.List;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class UserLand extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class ResultDisplay extends AppCompatActivity {
 
-    private ActionBarDrawerToggle drawerToggle;
-    View parentView;
-
-    private static final String TAG = LogInActivity.class.getSimpleName();
-    private  List<Medicine> medicines;
+    private static final String TAG = UserLand.class.getSimpleName();
+    private List<Medicine> modelMedicines;
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayout;
     private MedicineAdapter adapter;
-
-    SessionManager session;
-
-    SQLiteHandler db;
 
     private OkHttpClient okhttpclient;
     private Request request;
@@ -64,49 +47,27 @@ public class UserLand extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_land);
+        setContentView(R.layout.activity_result_display);
 
-        session = new SessionManager(getApplicationContext());
-        session.checkLogin();
+        Bundle bundle = getIntent().getExtras();
+        String ids = bundle.getString("ID");
+        String table = bundle.getString("Table_Name");
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.user_toolbar);
-        setSupportActionBar(toolbar);
-
-        recyclerView = (RecyclerView)findViewById(R.id.recyclerview);
-        medicines = new ArrayList<>();
-        getMedFromDB(0);
+        recyclerView = (RecyclerView)findViewById(R.id.searchshow);
+        modelMedicines = new ArrayList<>();
+        getMedDB(ids, table);
 
         gridLayout = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(gridLayout);
 
-        adapter = new MedicineAdapter(this,medicines);
+        adapter = new MedicineAdapter(this, modelMedicines);
         recyclerView.setAdapter(adapter);
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
-                if (gridLayout.findLastCompletelyVisibleItemPosition() == medicines.size() - 1) {
-                    getMedFromDB(medicines.get(medicines.size() - 1).getId());
-                }
-
-            }
-        });
-
-       DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.user_drawer);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        mDrawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView nvDrawer = (NavigationView)findViewById(R.id.nvView);
-        nvDrawer.setNavigationItemSelectedListener(this);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.menu_search));
         SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -163,13 +124,13 @@ public class UserLand extends AppCompatActivity
         }
 
         if(strArr[0].equals("levestein_distance")){
-            Intent intent = new Intent(UserLand.this, SearchResults.class);
+            Intent intent = new Intent(ResultDisplay.this, SearchResults.class);
             intent.putExtra("message", strArr[1]);
             intent.putExtra("message1", strArr[2]);
             startActivity(intent);
         }
         else if(strArr[0].equals("medicine")){
-            Intent intent = new Intent(UserLand.this, ResultDisplay.class);
+            Intent intent = new Intent(ResultDisplay.this, ResultDisplay.class);
             intent.putExtra("ID", strArr[1]);
             System.out.println(">>>>"+strArr[1]);
             intent.putExtra("Table_Name", strArr[2]);
@@ -177,22 +138,31 @@ public class UserLand extends AppCompatActivity
             /*Intent intent = new Intent(this, MedSearch.class);
             startActivity(intent);*/
         }
-        else if(strArr[0].equals("tags")){
-
-        }
-        else{
-            Toast.makeText(this, "Error in search query", Toast.LENGTH_LONG).show();
-        }
     }
 
-    private void getMedFromDB(int id){
-        AsyncTask<Integer, Void, Void> asyncTask = new AsyncTask<Integer, Void, Void>() {
+    private void getMedDB(String idl, String table){
+
+        AsyncTask<String, String, Void> asyncTask = new AsyncTask<String, String, Void>() {
             @Override
-            protected Void doInBackground(Integer... medIds) {
+            protected Void doInBackground(String... params) {
+
+                String ids = params[0];
+                System.out.println("^^^^^"+ids);
+                String tables = params[1];
+                System.out.println("&&&&&&&&"+tables);
+
+                HttpUrl url = new HttpUrl.Builder()
+                        .scheme("http")
+                        .host("192.168.0.102")
+                        .addPathSegment("medstoretest")
+                        .addPathSegment("search.php")
+                        .addQueryParameter("tbl", tables)
+                        .addQueryParameter("id", ids)
+                        .build();
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("http:/192.168.0.102/medstoretest/display.php?id=" + medIds[0])
+                        .url(url)
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
@@ -202,12 +172,15 @@ public class UserLand extends AppCompatActivity
                     for (int i = 0; i < array.length(); i++) {
 
                         JSONObject object = array.getJSONObject(i);
+                        System.out.println(object);
 
-                        Medicine medicine = new Medicine(object.getInt("id"), object.getString("med_name"),
+                        Medicine modelMedicine = new Medicine(object.getInt("id"), object.getString("med_name"),
                                 object.getString("med_image"), object.getString("med_price"));
 
-                        UserLand.this.medicines.add(medicine);
+                        ResultDisplay.this.modelMedicines.add(modelMedicine);
                     }
+
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -222,48 +195,7 @@ public class UserLand extends AppCompatActivity
             }
         };
 
-        asyncTask.execute(id);
+        asyncTask.execute(idl, table);
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.user_drawer);
-        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
-            mDrawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.cart) {
-            db = new SQLiteHandler(this.getApplicationContext());
-
-            Log.d("Reading: ", "Reading all contacts..");
-            List<Product> products = db.getAllProducts();
-
-            for (Product cn : products) {
-                String log = "Id: "+cn.getId()+" ,Name: " + cn.getName() + " ,Price: " + cn.getPrice();
-                Log.d("Name: ", log);
-            }
-
-            Intent i = new Intent(getApplicationContext(), Cart.class);
-            startActivity(i);
-        }
-        else if (id == R.id.signout) {
-            session.logoutUser();
-            Toast.makeText(this, "You have been logged out", Toast.LENGTH_SHORT).show();
-        }
-        else if (id == R.id.upload){
-            Intent i = new Intent(getApplicationContext(), Prescription.class);
-            startActivity(i);
-        }
-
-        DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.user_drawer);
-        mDrawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 }
-

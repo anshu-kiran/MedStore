@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--<item android:title="Category">
-        <menu>
-            <item
-                android:id="@+id/pres"
-                android:icon="@drawable/pres"
-                android:title="Prescription Drugs"/>
-
-            <item
-                android:id="@+id/nopres"
-                android:icon="@drawable/nopres"
-                android:title="Non-Prescription Drugs"/>
-        </menu>
-    </item>-->
-
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/cart"
@@ -26,18 +12,14 @@
             android:icon="@drawable/upload"
             android:title="Upload Prescription"/>
 
-        <item
-            android:id="@+id/signout"
-            android:icon="@drawable/signout"
-            android:title="Sign Out" />
     </group>
 
-    <item android:title="Contact">
+    <item android:title="Settings">
         <menu>
             <item
-                android:icon="@drawable/ic_about"
-                android:id="@+id/about"
-                android:title="About Us"/>
+                android:id="@+id/signout"
+                android:icon="@drawable/signout"
+                android:title="Sign Out" />
         </menu>
     </item>
 

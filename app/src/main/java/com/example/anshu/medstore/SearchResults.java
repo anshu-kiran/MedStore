@@ -24,7 +24,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class Search extends AppCompatActivity {
+public class SearchResults extends AppCompatActivity {
 
     private static final String TAG = LogInActivity.class.getSimpleName();
 
@@ -36,7 +36,7 @@ public class Search extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_search_results);
 
         Bundle bundle = getIntent().getExtras();
         String message = bundle.getString("message");
@@ -109,10 +109,19 @@ public class Search extends AppCompatActivity {
         }
 
         if(strArr[0].equals("levestein_distance")){
-            Intent intent = new Intent(Search.this, Search.class);
+            Intent intent = new Intent(SearchResults.this, SearchResults.class);
             intent.putExtra("message", strArr[1]);
             intent.putExtra("message1", strArr[2]);
             startActivity(intent);
+        }
+        else if(strArr[0].equals("medicine")){
+            Intent intent = new Intent(SearchResults.this, ResultDisplay.class);
+            intent.putExtra("ID", strArr[1]);
+            System.out.println(">>>>"+strArr[1]);
+            intent.putExtra("Table_Name", strArr[2]);
+            startActivity(intent);
+            /*Intent intent = new Intent(this, MedSearch.class);
+            startActivity(intent);*/
         }
     }
 }
