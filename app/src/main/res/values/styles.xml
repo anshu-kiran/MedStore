@@ -6,6 +6,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/colorEditextDisabled</item>
+        <item name="colorControlActivated">@color/colorEditextEnabled</item> // change this color to the required cursor color your need.
+        <item name="colorControlHighlight">@color/colorEditextEnabled</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
