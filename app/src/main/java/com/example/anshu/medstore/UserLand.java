@@ -1,5 +1,6 @@
 package com.example.anshu.medstore;
 
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -57,7 +58,8 @@ public class UserLand extends AppCompatActivity
     SQLiteHandler db;
 
     private OkHttpClient okhttpclient;
-    private Request request;
+
+    ProgressDialog PD;
 
     private String url_search = "http://192.168.0.102/MedStoreTest/connect_python.php";
 
@@ -82,7 +84,7 @@ public class UserLand extends AppCompatActivity
         adapter = new MedicineAdapter(this,medicines);
         recyclerView.setAdapter(adapter);
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        /*recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 
@@ -92,7 +94,7 @@ public class UserLand extends AppCompatActivity
 
             }
         });
-
+*/
        DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.user_drawer);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -224,6 +226,17 @@ public class UserLand extends AppCompatActivity
 
     private void getMedFromDB(int id){
         AsyncTask<Integer, Void, Void> asyncTask = new AsyncTask<Integer, Void, Void>() {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                PD = new ProgressDialog(UserLand.this);
+                PD.setTitle("Please Wait");
+                PD.setMessage("Loading...");
+                PD.setCancelable(false);
+                PD.show();
+            }
+
             @Override
             protected Void doInBackground(Integer... medIds) {
 
@@ -255,7 +268,9 @@ public class UserLand extends AppCompatActivity
 
             @Override
             protected void onPostExecute(Void aVoid) {
+
                 adapter.notifyDataSetChanged();
+                PD.dismiss();
             }
         };
 

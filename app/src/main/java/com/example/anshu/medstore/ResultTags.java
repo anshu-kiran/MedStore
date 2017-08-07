@@ -1,5 +1,6 @@
 package com.example.anshu.medstore;
 
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -40,6 +41,8 @@ public class ResultTags extends AppCompatActivity {
     private MedicineAdapter adapter;
 
     private OkHttpClient okhttpclient;
+
+    ProgressDialog PD;
 
     private String url_search = "http://192.168.0.102/MedStoreTest/connect_python.php";
 
@@ -198,6 +201,17 @@ public class ResultTags extends AppCompatActivity {
     private void getMed(String names, String table){
 
         AsyncTask<String, String, Void> asyncTask = new AsyncTask<String, String, Void>() {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                PD = new ProgressDialog(ResultTags.this);
+                PD.setTitle("Please Wait");
+                PD.setMessage("Loading...");
+                PD.setCancelable(false);
+                PD.show();
+            }
+
             @Override
             protected Void doInBackground(String... params) {
 
@@ -246,10 +260,12 @@ public class ResultTags extends AppCompatActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
+
                 adapter.notifyDataSetChanged();
             }
         };
 
         asyncTask.execute(names, table);
+        PD.dismiss();
     }
 }
