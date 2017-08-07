@@ -35,12 +35,17 @@
         </activity>
         <activity android:name=".SignUpActivity" />
         <activity android:name=".LogInActivity" />
-        <activity android:name=".SearchResults" />
-        <activity android:name=".Cart" />
+        <activity android:name=".SearchResults"
+            android:noHistory="true"/>
+        <activity android:name=".Cart"
+            android:noHistory="true"/>
         <activity android:name=".Prescription" />
         <activity android:name=".AdminPanel" />
         <activity android:name=".OrderDisplay" />
-        <activity android:name=".ResultDisplay"></activity>
+        <activity android:name=".ResultDisplay"
+            android:noHistory="true"/>
+        <activity android:name=".ResultTags"
+            android:noHistory="true"/>
     </application>
 
 </manifest>

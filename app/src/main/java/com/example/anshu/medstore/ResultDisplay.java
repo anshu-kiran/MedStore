@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,6 +69,7 @@ public class ResultDisplay extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.menu_search));
         SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -75,6 +77,7 @@ public class ResultDisplay extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+
                 okhttpclient = new OkHttpClient();
 
                 RequestBody Body = new FormBody.Builder().add("Query", query.toString()).build();
@@ -86,6 +89,7 @@ public class ResultDisplay extends AppCompatActivity {
                     public void onFailure(Call call, IOException e) {
                         Log.i(TAG,e.getMessage());
                     }
+
 
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
@@ -135,8 +139,44 @@ public class ResultDisplay extends AppCompatActivity {
             System.out.println(">>>>"+strArr[1]);
             intent.putExtra("Table_Name", strArr[2]);
             startActivity(intent);
-            /*Intent intent = new Intent(this, MedSearch.class);
-            startActivity(intent);*/
+        }
+        else if(strArr[0].equals("tags")){
+            if(strArr.length<=1){
+                ResultDisplay.this.runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        Toast.makeText(ResultDisplay.this, "No result matches the search query. Please try " +
+                                "a new search by using another keyword.", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+            else{
+                int n = strArr.length-1;
+                String[] arr = new String[n];
+                System.arraycopy(strArr,1,arr,0,n);
+
+                for(int i=0; i<n; i++){
+                    System.out.println("=="+arr[i]);
+                }
+
+                for(String s:arr){
+                    System.out.println("!!!"+s);
+                }
+
+                Intent intent = new Intent(this, ResultTags.class);
+                intent.putExtra("strings", arr);
+                startActivity(intent);
+            }
+        }
+        else{
+            ResultDisplay.this.runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    Toast.makeText(ResultDisplay.this, "Error in search query entered.", Toast.LENGTH_LONG).show();
+                }
+            });
         }
     }
 

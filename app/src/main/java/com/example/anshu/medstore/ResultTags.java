@@ -2,52 +2,84 @@ package com.example.anshu.medstore;
 
 import android.app.SearchManager;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class SearchResults extends AppCompatActivity {
+public class ResultTags extends AppCompatActivity {
 
-    private static final String TAG = LogInActivity.class.getSimpleName();
+    private static final String TAG = UserLand.class.getSimpleName();
+    private List<Medicine> modelMedicines;
+    private RecyclerView recyclerView;
+    private GridLayoutManager gridLayout;
+    private MedicineAdapter adapter;
 
     private OkHttpClient okhttpclient;
-    private Request request;
 
     private String url_search = "http://192.168.0.102/MedStoreTest/connect_python.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_results);
+        setContentView(R.layout.activity_result_tags);
 
-        Bundle bundle = getIntent().getExtras();
-        String message = bundle.getString("message");
-        String message1 = bundle.getString("message1");
+        Intent intent = getIntent();
+        String[] name = intent.getStringArrayExtra("strings");
 
-        TextView txtView = (TextView) findViewById(R.id.disp);
-        txtView.setText(message);
+        int n = name.length;
+        String[] table = new String[n];
+        String firsts;
 
-        TextView txtView1 = (TextView) findViewById(R.id.disp1);
-        txtView1.setText(message1);
+        for(int i=0; i<n; i++){
+            firsts = name[i].substring(0,1);
+            table[i] = firsts+"_medlist";
+        }
+
+        for(String s:name){
+            System.out.println("###"+s);
+        }
+
+        for(String s:table){
+            System.out.println(s);
+        }
+
+        recyclerView = (RecyclerView)findViewById(R.id.tagshow);
+        modelMedicines = new ArrayList<>();
+
+        for(int i=0; i<n; i++) {
+            getMed(name[i], table[i]);
+        }
+
+        gridLayout = new GridLayoutManager(this, 2);
+        recyclerView.setLayoutManager(gridLayout);
+
+        adapter = new MedicineAdapter(this, modelMedicines);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -73,7 +105,6 @@ public class SearchResults extends AppCompatActivity {
                     public void onFailure(Call call, IOException e) {
                         Log.i(TAG,e.getMessage());
                     }
-
 
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
@@ -112,13 +143,13 @@ public class SearchResults extends AppCompatActivity {
         }
 
         if(strArr[0].equals("levestein_distance")){
-            Intent intent = new Intent(SearchResults.this, SearchResults.class);
+            Intent intent = new Intent(ResultTags.this, SearchResults.class);
             intent.putExtra("message", strArr[1]);
             intent.putExtra("message1", strArr[2]);
             startActivity(intent);
         }
         else if(strArr[0].equals("medicine")){
-            Intent intent = new Intent(SearchResults.this, ResultDisplay.class);
+            Intent intent = new Intent(ResultTags.this, ResultDisplay.class);
             intent.putExtra("ID", strArr[1]);
             System.out.println(">>>>"+strArr[1]);
             intent.putExtra("Table_Name", strArr[2]);
@@ -126,11 +157,11 @@ public class SearchResults extends AppCompatActivity {
         }
         else if(strArr[0].equals("tags")){
             if(strArr.length<=1){
-                SearchResults.this.runOnUiThread(new Runnable() {
+                ResultTags.this.runOnUiThread(new Runnable() {
 
                     @Override
                     public void run() {
-                        Toast.makeText(SearchResults.this, "No result matches the search query. Please try " +
+                        Toast.makeText(ResultTags.this, "No result matches the search query. Please try " +
                                 "a new search by using another keyword.", Toast.LENGTH_LONG).show();
                     }
                 });
@@ -154,13 +185,71 @@ public class SearchResults extends AppCompatActivity {
             }
         }
         else{
-            SearchResults.this.runOnUiThread(new Runnable() {
+            ResultTags.this.runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
-                    Toast.makeText(SearchResults.this, "Error in search query entered.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ResultTags.this, "Error in search query entered.", Toast.LENGTH_LONG).show();
                 }
             });
         }
+    }
+
+    private void getMed(String names, String table){
+
+        AsyncTask<String, String, Void> asyncTask = new AsyncTask<String, String, Void>() {
+            @Override
+            protected Void doInBackground(String... params) {
+
+                String name = params[0];
+                System.out.println("^^^^^"+name);
+                String tables = params[1];
+                System.out.println("&&&&&&&&"+tables);
+
+                HttpUrl url = new HttpUrl.Builder()
+                        .scheme("http")
+                        .host("192.168.0.102")
+                        .addPathSegment("medstoretest")
+                        .addPathSegment("tags.php")
+                        .addQueryParameter("tbl", tables)
+                        .addQueryParameter("med_name", name)
+                        .build();
+
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+                try {
+                    Response response = client.newCall(request).execute();
+
+                    JSONArray array = new JSONArray(response.body().string());
+
+                    for (int i = 0; i < array.length(); i++) {
+
+                        JSONObject object = array.getJSONObject(i);
+                        System.out.println(object);
+
+                        Medicine modelMedicine = new Medicine(object.getInt("id"), object.getString("med_name"),
+                                object.getString("med_image"), object.getString("med_price"));
+
+                        ResultTags.this.modelMedicines.add(modelMedicine);
+                    }
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                adapter.notifyDataSetChanged();
+            }
+        };
+
+        asyncTask.execute(names, table);
     }
 }
