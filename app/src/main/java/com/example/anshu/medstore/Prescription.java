@@ -14,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -22,15 +21,14 @@ import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadNotificationConfig;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class Prescription extends AppCompatActivity implements View.OnClickListener {
 
     //Declaring views
-    private Button buttonChoose;
-    private Button buttonUpload;
+    private Button buttonChoose, buttonUpload;
     private ImageView imageView;
-    private EditText editText;
 
     //Image request code
     private int PICK_IMAGE_REQUEST = 1;
@@ -44,6 +42,8 @@ public class Prescription extends AppCompatActivity implements View.OnClickListe
     //Uri to store the image uri
     private Uri filePath;
 
+    SessionManager session;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,11 +56,12 @@ public class Prescription extends AppCompatActivity implements View.OnClickListe
         buttonChoose = (Button) findViewById(R.id.buttonChoose);
         buttonUpload = (Button) findViewById(R.id.buttonUpload);
         imageView = (ImageView) findViewById(R.id.imageView);
-        editText = (EditText) findViewById(R.id.editTextName);
 
         //Setting clicklistener
         buttonChoose.setOnClickListener(this);
         buttonUpload.setOnClickListener(this);
+
+        session = new SessionManager(getApplicationContext());
     }
 
 
@@ -69,26 +70,39 @@ public class Prescription extends AppCompatActivity implements View.OnClickListe
     * We need the full image path and the name for the image in this method
     * */
     public void uploadMultipart() {
-        //getting name for the image
-        String name = editText.getText().toString().trim();
 
         //getting the actual path of the image
         String path = getPath(filePath);
 
-        //Uploading code
-        try {
-            String uploadId = UUID.randomUUID().toString();
+        if(path.equals("null")){
+            Toast.makeText(this, "No file chosen", Toast.LENGTH_SHORT);
+        }
+        else{
+            //getting name for the image
+            String name = path.substring(path.lastIndexOf("/")+1);
 
-            //Creating a multi part request
-            new MultipartUploadRequest(this, uploadId, Config.UPLOAD_URL)
-                    .addFileToUpload(path, "image") //Adding file
-                    .addParameter("name", name) //Adding text parameter to the request
-                    .setNotificationConfig(new UploadNotificationConfig())
-                    .setMaxRetries(2)
-                    .startUpload(); //Starting the upload
+            HashMap<String, String> user = session.getUserDetails();
+            String usern = user.get(SessionManager.KEY_NAME);
 
-        } catch (Exception exc) {
-            Toast.makeText(this, exc.getMessage(), Toast.LENGTH_SHORT).show();
+            //Uploading code
+            try {
+                String uploadId = UUID.randomUUID().toString();
+
+                //Creating a multi part request
+                new MultipartUploadRequest(this, uploadId, Config.UPLOAD_URL)
+                        .addFileToUpload(path, "image") //Adding file
+                        .addParameter("name", name) //Adding text parameter to the request
+                        .addParameter("username", usern)
+                        .setNotificationConfig(new UploadNotificationConfig())
+                        .setMaxRetries(2)
+                        .startUpload(); //Starting the upload
+
+            } catch (Exception exc) {
+                Toast.makeText(this, exc.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            Intent intent = new Intent(this, UserLand.class);
+            startActivity(intent);
         }
     }
 
@@ -121,20 +135,24 @@ public class Prescription extends AppCompatActivity implements View.OnClickListe
 
     //method to get the file path from uri
     public String getPath(Uri uri) {
-        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-        cursor.moveToFirst();
-        String document_id = cursor.getString(0);
-        document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
-        cursor.close();
+        if(uri!=null){
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            cursor.moveToFirst();
+            String document_id = cursor.getString(0);
+            document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
+            cursor.close();
 
-        cursor = getContentResolver().query(
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
-        cursor.moveToFirst();
-        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-        cursor.close();
+            cursor = getContentResolver().query(
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+            cursor.moveToFirst();
+            String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            cursor.close();
 
-        return path;
+            return path;
+        }
+        else
+            return "null";
     }
 
 
@@ -181,6 +199,4 @@ public class Prescription extends AppCompatActivity implements View.OnClickListe
             uploadMultipart();
         }
     }
-
-
 }

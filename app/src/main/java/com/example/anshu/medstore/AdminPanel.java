@@ -8,7 +8,7 @@ import android.widget.Button;
 
 public class AdminPanel extends AppCompatActivity {
 
-    Button viewOrder, logout;
+    Button viewOrder, logout, viewPres;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +25,15 @@ public class AdminPanel extends AppCompatActivity {
         });
 
         logout = (Button)findViewById(R.id.btnLog);
+        logout.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), LogInActivity.class);
+                startActivity(i);
+            }
+        });
+
+        viewPres = (Button)findViewById(R.id.btnPresview);
         logout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {

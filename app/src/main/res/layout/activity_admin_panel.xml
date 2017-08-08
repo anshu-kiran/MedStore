@@ -37,6 +37,20 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/btnOrderview"
+        android:id="@+id/btnPresview"
+        android:text="View Prescriptions"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:padding="12dp"
+        android:textColor="#fff"
+        android:background="#000095"/>
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnPresview"
         android:id="@+id/btnLog"
         android:text="Log out"
         android:layout_marginLeft="15dp"
@@ -47,18 +61,6 @@
         android:textColor="#fff"
         android:background="#000095"/>
 
-    <!--<Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnOrderview"
-        android:id="@+id/btnPresview"
-        android:text="View Prescriptions"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="24dp"
-        android:padding="12dp"
-        android:textColor="#fff"
-        android:background="#000095"/>-->
+
 
 </RelativeLayout>

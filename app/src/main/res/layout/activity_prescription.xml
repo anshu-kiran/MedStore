@@ -43,21 +43,9 @@
             android:textColor="#fff"
             android:background="#000095"/>
 
-        <EditText
-            android:id="@+id/editTextName"
-            android:hint="Name For Image"
-            android:textAlignment="center"
-            android:layout_below="@+id/buttonChoose"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/EditTextTheme"
-            android:textColor="#fff"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"/>
-
         <Button
             android:id="@+id/buttonUpload"
-            android:layout_below="@+id/editTextName"
+            android:layout_below="@+id/buttonChoose"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="Upload"
