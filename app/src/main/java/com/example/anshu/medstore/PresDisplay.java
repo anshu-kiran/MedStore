@@ -19,44 +19,40 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-/**
- * Created by Anshu on 6/22/2017.
- */
+public class PresDisplay extends AppCompatActivity {
 
-public class OrderDisplay extends AppCompatActivity {
-
-    private static final String TAG = OrderDisplay.class.getSimpleName();
-    private List<Order> orderModel;
+    private static final String TAG = UserLand.class.getSimpleName();
+    private List<Pres> presModel;
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayout;
-    private OrderAdapter adapter;
+    private PresAdapter adapter;
 
     ProgressDialog PD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.order_list);
+        setContentView(R.layout.activity_pres_display);
 
-        recyclerView = (RecyclerView) findViewById(R.id.orderrecyclerview);
-        orderModel = new ArrayList<>();
+        recyclerView = (RecyclerView) findViewById(R.id.presview);
+        presModel = new ArrayList<>();
 
 
         gridLayout = new GridLayoutManager(this, 1);
         recyclerView.setLayoutManager(gridLayout);
 
-        adapter = new OrderAdapter(this, orderModel);
+        adapter = new PresAdapter(this, presModel);
         recyclerView.setAdapter(adapter);
-        getOrdersFromDB();
+        getPresFromDB();
     }
 
-    private void getOrdersFromDB(){
+    private void getPresFromDB(){
         AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                PD = new ProgressDialog(OrderDisplay.this);
+                PD = new ProgressDialog(PresDisplay.this);
                 PD.setTitle("Please Wait");
                 PD.setMessage("Loading...");
                 PD.setCancelable(false);
@@ -67,7 +63,7 @@ public class OrderDisplay extends AppCompatActivity {
             protected Void doInBackground(Void... voids) {
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("http://192.168.0.102/medstoretest/order_display.php")
+                        .url("http://192.168.0.102/medstoretest/pres_display.php")
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
@@ -78,11 +74,15 @@ public class OrderDisplay extends AppCompatActivity {
 
                         JSONObject object = array.getJSONObject(i);
 
-                        Order order = new Order(object.getInt("id"), object.getString("username"),
-                                object.getString("orders"), object.getInt("cost"));
+                        Pres pres = new Pres(object.getInt("id"), object.getString("username"),
+                                object.getString("url"));
 
-                        OrderDisplay.this.orderModel.add(order);
+                        System.out.println("%%%%%"+pres);
+
+                        PresDisplay.this.presModel.add(pres);
                     }
+
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -101,4 +101,3 @@ public class OrderDisplay extends AppCompatActivity {
 
     }
 }
-

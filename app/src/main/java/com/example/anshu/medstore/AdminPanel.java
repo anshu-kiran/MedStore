@@ -34,10 +34,10 @@ public class AdminPanel extends AppCompatActivity {
         });
 
         viewPres = (Button)findViewById(R.id.btnPresview);
-        logout.setOnClickListener(new View.OnClickListener(){
+        viewPres.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), LogInActivity.class);
+                Intent i = new Intent(getApplicationContext(), PresDisplay.class);
                 startActivity(i);
             }
         });
