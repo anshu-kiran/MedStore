@@ -37,7 +37,6 @@ public class Cart extends AppCompatActivity {
     String usern;
 
     private OkHttpClient okhttpclient;
-    private String url_order_insert = "http://192.168.0.102/MedStoreTest/order_insert.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +102,7 @@ public class Cart extends AppCompatActivity {
                         .build();
 
                 Request request = new Request.Builder()
-                        .url(url_order_insert).post(Body).build();
+                        .url(Config.ORDER_INSERT).post(Body).build();
 
                 //execute the request
                 okhttpclient.newCall(request).enqueue(new Callback() {

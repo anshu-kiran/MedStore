@@ -6,10 +6,6 @@ import android.content.SharedPreferences;
 
 import java.util.HashMap;
 
-/**
- * Created by Anshu on 6/19/2017.
- */
-
 public class SessionManager {
     // Shared Preferences
     SharedPreferences pref;

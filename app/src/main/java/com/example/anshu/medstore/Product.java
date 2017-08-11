@@ -1,9 +1,5 @@
 package com.example.anshu.medstore;
 
-/**
- * Created by Anshu on 6/20/2017.
- */
-
 public class Product {
 
     int id;

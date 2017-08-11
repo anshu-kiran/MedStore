@@ -32,9 +32,6 @@ public class SignUpActivity extends AppCompatActivity {
     private OkHttpClient okhttpclient;
     private Request request;
 
-    //url
-    private String url_create_user = "http://192.168.0.102/MedStoreTest/create_user.php";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +95,7 @@ public class SignUpActivity extends AppCompatActivity {
                 .build();
 
         Request request = new Request.Builder()
-                .url(url_create_user).post(Body).build();
+                .url(Config.CREATE_USER).post(Body).build();
 
         //execute the request
         okhttpclient.newCall(request).enqueue(new Callback() {

@@ -61,8 +61,6 @@ public class UserLand extends AppCompatActivity
 
     ProgressDialog PD;
 
-    private String url_search = "http://192.168.0.102/MedStoreTest/connect_python.php";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,7 +119,7 @@ public class UserLand extends AppCompatActivity
 
                 RequestBody Body = new FormBody.Builder().add("Query", query.toString()).build();
 
-                Request request = new Request.Builder().url(url_search).post(Body).build();
+                Request request = new Request.Builder().url(Config.SEARCH).post(Body).build();
 
                 okhttpclient.newCall(request).enqueue(new Callback() {
                     @Override
@@ -242,7 +240,7 @@ public class UserLand extends AppCompatActivity
 
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("http:/192.168.0.102/medstoretest/display.php?id=" + medIds[0])
+                        .url(Config.MEDICINE_DISPLAY + medIds[0])
                         .build();
                 try {
                     Response response = client.newCall(request).execute();

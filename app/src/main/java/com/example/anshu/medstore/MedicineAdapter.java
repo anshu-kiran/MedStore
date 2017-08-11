@@ -1,11 +1,8 @@
 package com.example.anshu.medstore;
 
-
 import android.content.Context;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,21 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-
-import org.xmlpull.v1.XmlSerializer;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
-import java.util.logging.Logger;
-
-import static android.R.attr.data;
-import static android.content.ContentValues.TAG;
-
 
 public class MedicineAdapter extends RecyclerView.Adapter<MedicineAdapter.ViewHolder>   {
 

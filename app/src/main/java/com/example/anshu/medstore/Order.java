@@ -1,9 +1,5 @@
 package com.example.anshu.medstore;
 
-/**
- * Created by Anshu on 6/22/2017.
- */
-
 public class Order {
     private int id, cost;
     private String username, orders;

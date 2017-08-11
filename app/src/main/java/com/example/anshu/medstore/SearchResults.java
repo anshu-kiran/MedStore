@@ -32,8 +32,6 @@ public class SearchResults extends AppCompatActivity {
     private OkHttpClient okhttpclient;
     private Request request;
 
-    private String url_search = "http://192.168.0.102/MedStoreTest/connect_python.php";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +64,7 @@ public class SearchResults extends AppCompatActivity {
 
                 RequestBody Body = new FormBody.Builder().add("Query", query.toString()).build();
 
-                Request request = new Request.Builder().url(url_search).post(Body).build();
+                Request request = new Request.Builder().url(Config.SEARCH).post(Body).build();
 
                 okhttpclient.newCall(request).enqueue(new Callback() {
                     @Override

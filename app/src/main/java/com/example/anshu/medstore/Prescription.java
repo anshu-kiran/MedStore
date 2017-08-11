@@ -36,8 +36,6 @@ public class Prescription extends AppCompatActivity implements View.OnClickListe
     //storage permission code
     private static final int STORAGE_PERMISSION_CODE = 123;
 
-    public static final String UPLOAD_URL = "http://192.168.0.102/MedStoreTest/file_upload.php";
-
     //Bitmap to get image from gallery
     private Bitmap bitmap;
 
@@ -90,7 +88,7 @@ public class Prescription extends AppCompatActivity implements View.OnClickListe
                 String uploadId = UUID.randomUUID().toString();
 
                 //Creating a multi part request
-                new MultipartUploadRequest(this, uploadId, UPLOAD_URL)
+                new MultipartUploadRequest(this, uploadId, Config.UPLOAD_URL)
                         .addFileToUpload(path, "image") //Adding file
                         .addParameter("name", name) //Adding text parameter to the request
                         .addParameter("username", usern)
