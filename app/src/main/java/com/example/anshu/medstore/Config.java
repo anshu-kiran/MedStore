@@ -16,4 +16,6 @@ public class Config {
 
     public static final String CREATE_USER = "http://192.168.0.102:8080/MedStoreTest/create_user.php";
 
+    public static final String LOGIN_USER = "http://192.168.0.102:8080/MedStoreTest/login.php";
+
 }

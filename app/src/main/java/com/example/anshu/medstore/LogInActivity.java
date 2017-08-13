@@ -11,18 +11,34 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 
 public class LogInActivity extends AppCompatActivity {
 
     Button loginButton;
     TextView signupLink;
-    EditText userText;
-    EditText passwordText;
+    EditText  userText;
+    EditText  passwordText;
+
+    SessionManager session;
 
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
 
-    SessionManager session;
+    private OkHttpClient okhttpclient;
+    private Request request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +49,6 @@ public class LogInActivity extends AppCompatActivity {
 
         userText = (EditText)findViewById(R.id.input_user);
         passwordText = (EditText)findViewById(R.id.input_password);
-
-        /*Toast.makeText(getApplicationContext(),
-                "User Login Status: " + session.isLoggedIn(),
-                Toast.LENGTH_LONG).show();*/
 
         loginButton = (Button) findViewById(R.id.btn_login);
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -72,7 +84,7 @@ public class LogInActivity extends AppCompatActivity {
         final ProgressDialog progressDialog = new ProgressDialog(LogInActivity.this,
                 R.style.AppTheme_NoActionBar);
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Logging In. Please wait...");
+        progressDialog.setMessage("Authenticating...");
         progressDialog.show();
 
         String email = userText.getText().toString();
@@ -80,28 +92,58 @@ public class LogInActivity extends AppCompatActivity {
 
         // TODO: Implement your own authentication logic here.
 
-        if(email.equals("user") && password.equals("user")){
-            session.createLoginSession("user");
-            Intent intent = new Intent(getApplicationContext(), UserLand.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        okhttpclient = new OkHttpClient();
+        RequestBody Body = new FormBody.Builder()
+                .add("format","json")
+                .add("UserName", email)
+                .add("Password", password)
+                .build();
 
-            // Add new Flag to start new Activity
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Request request = new Request.Builder()
+                .url(Config.LOGIN_USER).post(Body).build();
 
-            onActivityResult(REQUEST_SIGNUP, RESULT_OK, intent);
-        }
-        else if(email.equals("admin") && password.equals("admin")){
-            Intent intent = new Intent(getApplicationContext(), AdminPanel.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        okhttpclient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                onLoginFailed();
+            }
 
-            // Add new Flag to start new Activity
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String resp = response.body().string();
+                System.out.println("^^"+resp);
 
-            onActivityResult(REQUEST_SIGNUP, RESULT_OK, intent);
-        }
-        else{
-            onLoginFailed();
-        }
+                try {
+                    JSONObject mainObject = new JSONObject(resp);
+                    String success = mainObject.getString("success");
+                    System.out.println("###"+success);
+                    if(success.equals("1")){
+                        String username = mainObject.getString("username");
+                        System.out.println("###"+success+ username);
+                        if(username.equals("admin")){
+                            Intent intent = new Intent(getApplicationContext(), AdminPanel.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                            // Add new Flag to start new Activity
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                            onActivityResult(REQUEST_SIGNUP, RESULT_OK, intent);
+                        }
+                        else{
+                            Intent i = new Intent(getApplicationContext(), UserLand.class);
+                            onActivityResult(REQUEST_SIGNUP, RESULT_OK, i);
+                        }
+                    }
+                    else{
+                        onLoginFailed();
+                    }
+                }
+                catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+            }
+        });
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
@@ -111,23 +153,24 @@ public class LogInActivity extends AppCompatActivity {
                         // onLoginFailed();
                         progressDialog.dismiss();
                     }
-                }, 3000);
+                }, 5000);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SIGNUP) {
             if (resultCode == RESULT_OK) {
-                // TODO: Implement successful signup logic here
+                session.createLoginSession("user");
                 startActivity(data);
+
             }
         }
     }
 
     @Override
     public void onBackPressed() {
-        // disable going back
-        moveTaskToBack(false);
+        // disable going back to the MainActivity
+        moveTaskToBack(true);
     }
 
     public void onLoginSuccess() {
@@ -136,11 +179,18 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     public void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        LogInActivity.this.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                Toast.makeText(LogInActivity.this, "Login failed", Toast.LENGTH_LONG).show();
+                loginButton.setEnabled(true);
+            }
+        });
+
         Intent i = new Intent(getApplicationContext(), LogInActivity.class);
         startActivity(i);
 
-        loginButton.setEnabled(true);
     }
 
     public boolean validate() {
@@ -148,7 +198,6 @@ public class LogInActivity extends AppCompatActivity {
 
         String email = userText.getText().toString();
         String password = passwordText.getText().toString();
-
 
 
         if (password.isEmpty() && email.isEmpty()) {
