@@ -32,6 +32,8 @@ public class SearchResults extends AppCompatActivity {
     private OkHttpClient okhttpclient;
     private Request request;
 
+    String qr;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,12 +42,16 @@ public class SearchResults extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         String message = bundle.getString("message");
         String message1 = bundle.getString("message1");
+        String query = bundle.getString("query");
 
         TextView txtView = (TextView) findViewById(R.id.disp);
         txtView.setText(message);
 
         TextView txtView1 = (TextView) findViewById(R.id.disp1);
         txtView1.setText(message1);
+
+        TextView txtView2 = (TextView) findViewById(R.id.query);
+        txtView2.setText("Your query is: \t"+query);
     }
 
     @Override
@@ -61,6 +67,7 @@ public class SearchResults extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
 
                 okhttpclient = new OkHttpClient();
+                qr = query.toString();
 
                 RequestBody Body = new FormBody.Builder().add("Query", query.toString()).build();
 
@@ -113,6 +120,7 @@ public class SearchResults extends AppCompatActivity {
             Intent intent = new Intent(SearchResults.this, SearchResults.class);
             intent.putExtra("message", strArr[1]);
             intent.putExtra("message1", strArr[2]);
+            intent.putExtra("query", qr);
             startActivity(intent);
         }
         else if(strArr[0].equals("medicine")){
@@ -120,6 +128,7 @@ public class SearchResults extends AppCompatActivity {
             intent.putExtra("ID", strArr[1]);
             System.out.println(">>>>"+strArr[1]);
             intent.putExtra("Table_Name", strArr[2]);
+            intent.putExtra("query", qr);
             startActivity(intent);
         }
         else if(strArr[0].equals("tags")){
@@ -148,6 +157,7 @@ public class SearchResults extends AppCompatActivity {
 
                 Intent intent = new Intent(this, ResultTags.class);
                 intent.putExtra("strings", arr);
+                intent.putExtra("query", qr);
                 startActivity(intent);
             }
         }

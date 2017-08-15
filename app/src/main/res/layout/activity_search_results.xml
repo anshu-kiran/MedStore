@@ -29,6 +29,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/header"
+            android:id="@+id/query"
+            android:layout_marginTop="20dp"
+            android:textSize="15dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/query"
             android:id="@+id/headr"
             android:text="Exact match not found. Maybe you mean:"
             android:layout_marginTop="20dp"

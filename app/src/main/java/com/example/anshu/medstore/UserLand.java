@@ -61,6 +61,8 @@ public class UserLand extends AppCompatActivity
 
     ProgressDialog PD;
 
+    String qr;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,17 +84,6 @@ public class UserLand extends AppCompatActivity
         adapter = new MedicineAdapter(this,medicines);
         recyclerView.setAdapter(adapter);
 
-        /*recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
-                if (gridLayout.findLastCompletelyVisibleItemPosition() == medicines.size() - 1) {
-                    getMedFromDB(medicines.get(medicines.size() - 1).getId());
-                }
-
-            }
-        });
-*/
        DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.user_drawer);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -116,6 +107,7 @@ public class UserLand extends AppCompatActivity
             public boolean onQueryTextSubmit(String query) {
 
                 okhttpclient = new OkHttpClient();
+                qr = query.toString();
 
                 RequestBody Body = new FormBody.Builder().add("Query", query.toString()).build();
 
@@ -168,6 +160,7 @@ public class UserLand extends AppCompatActivity
             Intent intent = new Intent(UserLand.this, SearchResults.class);
             intent.putExtra("message", strArr[1]);
             intent.putExtra("message1", strArr[2]);
+            intent.putExtra("query", qr);
             startActivity(intent);
         }
         else if(strArr[0].equals("medicine")){
@@ -175,9 +168,8 @@ public class UserLand extends AppCompatActivity
             intent.putExtra("ID", strArr[1]);
             System.out.println(">>>>"+strArr[1]);
             intent.putExtra("Table_Name", strArr[2]);
+            intent.putExtra("query", qr);
             startActivity(intent);
-            /*Intent intent = new Intent(this, MedSearch.class);
-            startActivity(intent);*/
         }
         else if(strArr[0].equals("tags")){
             if(strArr.length<=1){
@@ -205,10 +197,8 @@ public class UserLand extends AppCompatActivity
 
                 Intent intent = new Intent(this, ResultTags.class);
                 intent.putExtra("strings", arr);
+                intent.putExtra("query", qr);
                 startActivity(intent);
-
-                /*Intent intent = new Intent(this, ResultTags.class);
-                startActivity(intent);*/
             }
         }
         else{

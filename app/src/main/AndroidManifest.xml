@@ -33,8 +33,10 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name=".SignUpActivity" />
-        <activity android:name=".LogInActivity" />
+        <activity android:name=".SignUpActivity"
+            android:noHistory="true"/>
+        <activity android:name=".LogInActivity"
+            android:noHistory="true"/>
         <activity
             android:name=".SearchResults"
             android:noHistory="true" />
@@ -50,7 +52,8 @@
         <activity
             android:name=".ResultTags"
             android:noHistory="true" />
-        <activity android:name=".PresDisplay"></activity>
+        <activity android:name=".PresDisplay" />
+        <activity android:name=".ViewUser"></activity>
     </application>
 
 </manifest>

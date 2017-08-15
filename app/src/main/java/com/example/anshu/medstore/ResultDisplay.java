@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -43,6 +44,7 @@ public class ResultDisplay extends AppCompatActivity {
     private OkHttpClient okhttpclient;
 
     ProgressDialog PD;
+    String qr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,7 @@ public class ResultDisplay extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         String ids = bundle.getString("ID");
         String table = bundle.getString("Table_Name");
+        String query = bundle.getString("query");
 
         recyclerView = (RecyclerView)findViewById(R.id.searchshow);
         modelMedicines = new ArrayList<>();
@@ -62,6 +65,9 @@ public class ResultDisplay extends AppCompatActivity {
 
         adapter = new MedicineAdapter(this, modelMedicines);
         recyclerView.setAdapter(adapter);
+
+        TextView txtView2 = (TextView) findViewById(R.id.query);
+        txtView2.setText("Your query is: \t"+query);
 
     }
 
@@ -78,6 +84,7 @@ public class ResultDisplay extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
 
                 okhttpclient = new OkHttpClient();
+                qr = query.toString();
 
                 RequestBody Body = new FormBody.Builder().add("Query", query.toString()).build();
 
@@ -130,6 +137,7 @@ public class ResultDisplay extends AppCompatActivity {
             Intent intent = new Intent(ResultDisplay.this, SearchResults.class);
             intent.putExtra("message", strArr[1]);
             intent.putExtra("message1", strArr[2]);
+            intent.putExtra("query", qr);
             startActivity(intent);
         }
         else if(strArr[0].equals("medicine")){
@@ -137,6 +145,7 @@ public class ResultDisplay extends AppCompatActivity {
             intent.putExtra("ID", strArr[1]);
             System.out.println(">>>>"+strArr[1]);
             intent.putExtra("Table_Name", strArr[2]);
+            intent.putExtra("query", qr);
             startActivity(intent);
         }
         else if(strArr[0].equals("tags")){
@@ -165,6 +174,7 @@ public class ResultDisplay extends AppCompatActivity {
 
                 Intent intent = new Intent(this, ResultTags.class);
                 intent.putExtra("strings", arr);
+                intent.putExtra("query", qr);
                 startActivity(intent);
             }
         }
