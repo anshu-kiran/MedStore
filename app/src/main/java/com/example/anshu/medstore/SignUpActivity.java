@@ -11,6 +11,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -83,9 +86,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         // TODO: Implement your own signup logic here.
 
-        // initalize http client
         okhttpclient = new OkHttpClient();
-        //initialize http request
         RequestBody Body = new FormBody.Builder()
                 .add("format","json")
                 .add("UserName", username)
@@ -97,7 +98,6 @@ public class SignUpActivity extends AppCompatActivity {
         Request request = new Request.Builder()
                 .url(Config.CREATE_USER).post(Body).build();
 
-        //execute the request
         okhttpclient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -106,37 +106,67 @@ public class SignUpActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Log.i(TAG,response.body().string());
+                String resp = response.body().string();
+                System.out.println("^^"+resp);
+
+                try {
+                    JSONObject mainObject = new JSONObject(resp);
+                    String success = mainObject.getString("success");
+                    System.out.println("###"+success);
+                    if(success.equals("true")){
+                        onSignup();
+                    }
+                    else if(success.equals("false")){
+                        onFailed();
+                    }
+                    else{
+                        onSignupFailed();
+                    }
+                }
+                catch (JSONException e){
+                    e.printStackTrace();
+                }
             }
         });
-
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onSignupSuccess or onSignupFailed
-                        // depending on success
-                        onSignupSuccess();
-                        // onSignupFailed();
-                        progressDialog.dismiss();
-                    }
-                }, 3000);
-    }
-
-
-    public void onSignupSuccess() {
-        signupButton.setEnabled(true);
-        setResult(RESULT_OK, null);
-        Toast.makeText(getApplicationContext(), "User Created", Toast.LENGTH_SHORT).show();
-        Toast.makeText(getApplicationContext(), "Login to Enter", Toast.LENGTH_SHORT).show();
-
-        Intent i = new Intent(getApplicationContext(), LogInActivity.class);
-        startActivity(i);
     }
 
     public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Registration failed", Toast.LENGTH_LONG).show();
 
-        signupButton.setEnabled(true);
+        SignUpActivity.this.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                signupButton.setEnabled(true);
+                Toast.makeText(getBaseContext(), "Registration failed", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    public void onFailed() {
+
+        SignUpActivity.this.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                signupButton.setEnabled(true);
+                Toast.makeText(getBaseContext(), "Username already exists. \nTry registering again!", Toast.LENGTH_LONG).show();
+                Intent i = new Intent(getApplicationContext(), SignUpActivity.class);
+                startActivity(i);
+            }
+        });
+    }
+
+    public void onSignup() {
+
+        SignUpActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getBaseContext(), "User created.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "Login to enter.", Toast.LENGTH_LONG).show();
+                Intent i = new Intent(getApplicationContext(), LogInActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
     public boolean validate() {
@@ -149,28 +179,34 @@ public class SignUpActivity extends AppCompatActivity {
 
 
         if (username.isEmpty()) {
-            nameText.setError("field empty");
+            nameText.setError("Field is empty");
             valid = false;
         } else {
             nameText.setError(null);
         }
 
         if (password.isEmpty()) {
-            passwordText.setError("field empty");
+            passwordText.setError("Field is empty");
             valid = false;
-        } else {
+        } else if(passwordText.getText().length()<=3) {
+            passwordText.setError("Password too short");
+            valid = false;
+        }else {
             passwordText.setError(null);
         }
 
         if (address.isEmpty()) {
-            addressText.setError("field is empty");
+            addressText.setError("Field is empty");
             valid = false;
         } else {
             addressText.setError(null);
         }
 
         if (phone.isEmpty()) {
-            phoneText.setError("field is empty");
+            phoneText.setError("Field is empty");
+            valid = false;
+        } else if(phoneText.getText().length()<10 || phoneText.getText().length()>10 || phoneText.getText().charAt(0)!='9') {
+            phoneText.setError("Invalid Phone Number");
             valid = false;
         } else {
             phoneText.setError(null);
