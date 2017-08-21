@@ -231,7 +231,7 @@ public class ResultTags extends AppCompatActivity {
 
                 HttpUrl url = new HttpUrl.Builder()
                         .scheme("http")
-                        .host("192.168.0.102")
+                        .host("192.168.0.100")
                         .port(8080)
                         .addPathSegment("medstoretest")
                         .addPathSegment("tags.php")

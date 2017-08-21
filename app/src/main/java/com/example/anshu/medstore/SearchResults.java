@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static android.content.ContentValues.TAG;
+
 public class SearchResults extends AppCompatActivity {
 
     private static final String TAG = LogInActivity.class.getSimpleName();
@@ -40,15 +43,68 @@ public class SearchResults extends AppCompatActivity {
         setContentView(R.layout.activity_search_results);
 
         Bundle bundle = getIntent().getExtras();
-        String message = bundle.getString("message");
-        String message1 = bundle.getString("message1");
+        final String message = bundle.getString("message");
+        final String message1 = bundle.getString("message1");
         String query = bundle.getString("query");
 
         TextView txtView = (TextView) findViewById(R.id.disp);
         txtView.setText(message);
+        txtView.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                okhttpclient = new OkHttpClient();
+
+                qr = message;
+                RequestBody Body = new FormBody.Builder().add("Query", message).build();
+
+                Request request = new Request.Builder().url(Config.SEARCH).post(Body).build();
+
+                okhttpclient.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.i(TAG,e.getMessage());
+                    }
+
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        searchRes(response.body().string());
+                    }
+                });
+
+            }
+        });
 
         TextView txtView1 = (TextView) findViewById(R.id.disp1);
         txtView1.setText(message1);
+        txtView1.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                okhttpclient = new OkHttpClient();
+
+                qr = message1;
+
+                RequestBody Body = new FormBody.Builder().add("Query", message1).build();
+
+                Request request = new Request.Builder().url(Config.SEARCH).post(Body).build();
+
+                okhttpclient.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.i(TAG,e.getMessage());
+                    }
+
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        searchRes(response.body().string());
+                    }
+                });
+
+            }
+        });
 
         TextView txtView2 = (TextView) findViewById(R.id.query);
         txtView2.setText("Your query is: \t"+query);

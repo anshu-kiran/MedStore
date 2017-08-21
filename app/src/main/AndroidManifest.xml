@@ -38,8 +38,7 @@
         <activity android:name=".LogInActivity"
             android:noHistory="true"/>
         <activity
-            android:name=".SearchResults"
-            android:noHistory="true" />
+            android:name=".SearchResults"/>
         <activity
             android:name=".Cart"
             android:noHistory="true" />

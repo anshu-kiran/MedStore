@@ -63,7 +63,7 @@ public class ViewUser extends AppCompatActivity {
             protected Void doInBackground(Void... voids) {
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("http://192.168.0.102:8080/medstoretest/view_user.php")
+                        .url(Config.VIEW_USER)
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
